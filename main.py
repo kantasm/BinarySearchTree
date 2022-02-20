@@ -85,6 +85,18 @@ class BinarySearchTreeNode:
                 return False
             return False
 
+    def find_maximum(self):
+        if self.right:
+            return self.right.find_maximum()
+        else:
+            return self.data
+
+    def find_minimum(self):
+        if self.left:
+            return self.left.find_minimum()
+        else:
+            return self.data
+
     def find_min(self):
         elements = []
 
@@ -103,6 +115,65 @@ class BinarySearchTreeNode:
             return elements[max_index]
         else:
             return -1
+
+    def clear_node(self):
+        self.left = None
+        self.right = None
+        self.data = None
+
+    def remove_node(self, value, parent=None):
+        if value < self.data and self.left:
+            return self.left.remove_node(value, self)
+        elif value < self.data:
+            return
+        elif value > self.data and self.right:
+            return self.right.remove_node(value, self)
+        elif value > self.data:
+            return
+        else:
+            if self.left is None and self.right is None and self == parent.left:
+                parent.left = None
+                self.clear_node()
+            elif self.left is None and self.right is None and self == parent.right:
+                parent.right = None
+                self.clear_node()
+            elif self.left and self.right is None and self == parent.left:
+                parent.left = self.left
+                self.clear_node()
+            elif self.left and self.right is None and self == parent.right:
+                parent.right = self.left
+                self.clear_node()
+            elif self.left is None and self.right and self == parent.right:
+                parent.right = self.right
+                self.clear_node()
+            elif self.left is None and self.right and self == parent.left:
+                parent.left = self.right
+                self.clear_node()
+            else:
+                self.data = self.right.find_minimum()
+                self.right.remove_node(self.data, self)
+            return
+
+    def delete_node(self, value):
+        if value > self.data:
+            if self.right:
+                self.right = self.right.delete_node(value)
+        elif value < self.data:
+            if self.left:
+                self.left = self.left.delete_node(value)
+        else:
+            if self.right is None and self.left is None:
+                return None
+            if self.right is None:
+                return self.left
+            if self.left is None:
+                return self.right
+
+            min_val = self.right.find_minimum()
+            self.data = min_val
+            self.right = self.right.delete_node(min_val)
+
+        return self
 
 
 def build_tree(elements):
@@ -126,13 +197,27 @@ if __name__ == '__main__':
     # find_max
     print(numbers_tree.find_max())
 
-    # find_max
+    # find_min
     print(numbers_tree.find_min())
 
     print(max(numbers))
     print(min(numbers))
+
+    # find_maximum
+    print(numbers_tree.find_maximum())
+
+    # find_minimum
+    print(numbers_tree.find_minimum())
+
+
     print(sorted(numbers))
     print(sorted(numbers,reverse=True))
+    print('Removing Node')
+   # numbers_tree.remove_node(17)
+    print(numbers_tree.in_order_traversal())
+
+    numbers_tree.delete_node(17)
+    print(numbers_tree.in_order_traversal())
 
     #strings = ['Pixel', 'Chromebook', 'Nest', 'Youtube', 'Maps', 'Alphabet','Google']
     #strings_tree = build_tree(strings)
